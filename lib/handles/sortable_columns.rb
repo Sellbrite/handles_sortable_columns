@@ -82,6 +82,7 @@ module Handles  #:nodoc:
           :indicator_text => {:asc => "&nbsp;&darr;&nbsp;", :desc => "&nbsp;&uarr;&nbsp;"},
           :page_param => "page",
           :sort_param => "sort",
+          :safe_params => [:sort],
           :default_sort_value => nil
         }
 
@@ -89,8 +90,8 @@ module Handles  #:nodoc:
       end
 
       def safe_params=(params = [])
-        @safe_params =
-          RAILS_SAFE_PARAMS + LIB_PARAMS + params.map(&:to_sym)
+        @safe_params ||= RAILS_SAFE_PARAMS + LIB_PARAMS
+        @safe_params += params.map(&:to_sym)
       end
 
       # Bracket access for convenience.
