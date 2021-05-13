@@ -40,9 +40,6 @@ module Handles  #:nodoc:
     #     ...
     #   end
     class Config
-      RAILS_SAFE_PARAMS = %i[action controller].freeze
-      LIB_PARAMS = %i[sort_param direction column page_param default_sort_value].freeze
-
       # CSS class for link (regardless of sorted state). Default:
       #
       #   SortableColumnLink
@@ -73,8 +70,6 @@ module Handles  #:nodoc:
       #  {:asc => "SortedAsc", :desc => "SortedDesc"}
       attr_accessor :indicator_class
 
-      attr_reader :safe_params
-
       def initialize(attrs = {})
         defaults = {
           :link_class => "SortableColumnLink",
@@ -82,16 +77,10 @@ module Handles  #:nodoc:
           :indicator_text => {:asc => "&nbsp;&darr;&nbsp;", :desc => "&nbsp;&uarr;&nbsp;"},
           :page_param => "page",
           :sort_param => "sort",
-          :safe_params => [:sort],
           :default_sort_value => nil
         }
 
         defaults.merge(attrs).each {|k, v| send("#{k}=", v)}
-      end
-
-      def safe_params=(params = [])
-        @safe_params ||= RAILS_SAFE_PARAMS + LIB_PARAMS
-        @safe_params += params.map(&:to_sym)
       end
 
       # Bracket access for convenience.
@@ -153,8 +142,7 @@ module Handles  #:nodoc:
       private
 
       def safety_params
-        @safety_params ||=
-          params.permit(sortable_columns_config.safe_params).to_h
+        @safety_params ||= params.permit!
       end
 
       # Internal/advanced use only. Parse sortable column sort param into a Hash with predefined keys.
